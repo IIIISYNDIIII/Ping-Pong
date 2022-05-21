@@ -44,15 +44,10 @@ display.set_caption("Пинг-понг")
 background = transform.scale(image.load("Без названия.jpeg"), (win_width, win_height))
  
 #Персонажи игры:
-player = Player('hero.png', 5, win_height - 80, 4)
-monster = Enemy('cyborg.png', win_width - 80, 280, 4)
-final = GameSprite('treasure.png', win_width - 120, win_height - 80, 0)
-
-
-
- 
- 
- 
+player = Player('1.png', 5, win_height - 80, 4)
+monster = Enemy('2.png', win_width - 80, 280, 4)
+ball = GameSprite(('ball.png'), win_width/2, win_height/2, 0)
+  
 game = True
 finish = False
 clock = time.Clock()
@@ -60,8 +55,9 @@ FPS = 60
  
 font.init()
 font = font.Font(None, 70)
-win = font.render('Ты натурал!', True, (255, 215, 0))
-lose = font.render('Ты', True, (180, 0, 0))
+#win = font.render('Ты натурал!', True, (255, 215, 0))
+lose1 = font.render('проиграл 1', True, (180, 0, 0))
+lose2 = font.render('проиграл 2', True, (180, 0, 0))
  
 #музыка
 mixer.init()
@@ -70,29 +66,41 @@ mixer.music.play()
  
 money = mixer.Sound('money.ogg')
 kick = mixer.Sound('kick.ogg')
+
+speed_x = 1
+speed_y = 1
  
 while game:
-   for e in event.get():
-       if e.type == QUIT:
-           game = False
+    for e in event.get():
+        if e.type == QUIT:
+            game = False
   
-   if finish != True:
-       window.blit(background,(0, 0))
-       player.update()
-       monster.update()
-      
-       player.reset()
-       monster.reset()
+    if finish != True:
+        window.blit(background,(0, 0))
+        player.update()
+        monster.update()
 
-   if sprite.collide_rect(player, monster):
-        finish = True
-        window.blit(lose, (200, 200))
+        ball.rect.x += speed_x
+        ball.rect.y += speed_y
 
-   if sprite.collide_rect(player, final):
-        finish = True
-        window.blit(win, (200, 200))
-        money.play()
 
- 
-   display.update()
-   clock.tick(FPS)
+        if sprite.collide_rect(player, ball) or sprite.collide_rect(monster, ball):
+            speed_x *= -1
+
+        if ball.rect.y > win_height-50 or ball.rect.y <0:
+            speed_y *= -1    
+
+        if ball.rect.x < 0:
+            finish = True
+            window.blit(lose1, (200, 200))
+
+        if ball.rect.x > win_width:
+            finish = True
+            window.blit(lose2, (200, 200))
+
+        player.reset()
+        monster.reset()
+        ball.reset()
+
+    display.update()
+    clock.tick(FPS)
